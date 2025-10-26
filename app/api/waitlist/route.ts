@@ -37,10 +37,22 @@ export async function POST(req: Request) {
 
     // Send confirmation emails (same as your current code)...
     await resend.emails.send({
-      from: "SocialChain <onboarding@resend.dev>",
+      from: "SocialChain <alptauri@gmail.com>",
       to: email,
-      subject: "🎉 Welcome to SocialChain Waitlist!",
-      html: `<p>Welcome email content here...</p>`,
+      subject: "🎉 Welcome to Nexora-Social Waitlist!",
+      html: `<div style="font-family: sans-serif; line-height: 1.6;">
+      <h2>Welcome to SocialChain! 🚀</h2>
+      <p>Thank you for joining our waitlist!</p>
+      <p>You're now on the list for early access when we launch. We'll notify you as soon as we're ready.</p>
+      <p>As an early adopter, you'll receive:</p>
+      <ul>
+        <li>🎁 Exclusive NFTs</li>
+        <li>⚡ Early access to the platform</li>
+        <li>🌟 Founder benefits</li>
+      </ul>
+      <p>Stay tuned!</p>
+      <p>The SocialChain Team</p>
+    </div>`,
     });
 
     return NextResponse.json({ success: true, message: "Successfully joined the waitlist!" });
