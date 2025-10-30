@@ -51,7 +51,7 @@ export default function LandingPage() {
             <div className="flex items-center space-x-2">
               <Hexagon className="w-8 h-8 text-purple-400" />
               <span className="text-xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-                SocialChain
+                Fluxa
               </span>
             </div>
             <div>
@@ -107,7 +107,7 @@ export default function LandingPage() {
         <div className="max-w-6xl mx-auto text-center">
           <div>
             <h2 className="text-5xl font-bold mb-6 bg-gradient-to-r from-purple-300 to-pink-300 bg-clip-text text-transparent">
-              Sneak Peek of SocialChain
+              Sneak Peek of Fluxa
             </h2>
             <p className="text-xl text-gray-300 mb-12 max-w-2xl mx-auto">
               Your content. Your ownership. A new kind of social feed is coming.
@@ -133,7 +133,7 @@ export default function LandingPage() {
         <div>
           <h2 className="text-5xl font-bold mb-6 bg-gradient-to-r from-purple-300 to-pink-300 bg-clip-text text-transparent">Why Ownership Matters</h2>
           <p className="max-w-3xl mx-auto text-gray-300 text-lg">
-            Traditional platforms control your reach, your data, and even your creative rights. SocialChain gives that power back to you — making every post verifiably yours, 
+            Traditional platforms control your reach, your data, and even your creative rights. Fluxa gives that power back to you — making every post verifiably yours, 
             protected by blockchain, and free from algorithmic manipulation.
           </p>
         </div>
@@ -206,9 +206,9 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto text-center space-y-4">
           <div className="flex justify-center items-center space-x-2">
             <Hexagon className="w-6 h-6 text-purple-400" />
-            <span className="text-lg font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">SocialChain</span>
+            <span className="text-lg font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">Fluxa</span>
           </div>
-          <p className="text-gray-400 text-sm">© 2025 SocialChain. All rights reserved. Built on Polygon.</p>
+          <p className="text-gray-400 text-sm">© 2025 Fluxa. All rights reserved. Built on Polygon.</p>
           <div className="flex justify-center space-x-4">
             <a href="#" className="p-3 bg-white/10 rounded-full hover:bg-purple-600 transition-all hover:scale-110">
               <Twitter className="w-5 h-5" />
