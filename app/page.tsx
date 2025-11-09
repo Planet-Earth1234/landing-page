@@ -1,14 +1,16 @@
 "use client";
 import React, { useState, useEffect, useRef } from 'react';
-import { Sparkles, Shield, Hexagon, X, Github, Send, Users, Zap, MessageSquare, ChevronDown, Play } from 'lucide-react';
+import { Sparkles, Shield, Hexagon, X, Github, Send, Users, Zap, MessageSquare, Play } from 'lucide-react';
 
 export default function LandingPage() {
   type FeedbackData = {
-  whatBrought: string[];
-  frustrations: string[];
-  features: string[];
-  additionalThoughts: string;
-};
+    motivation: string;
+    frustration: string;
+    wish: string;
+    earlyAccess: string;
+    earlyAccessReason: string;
+    additionalThoughts: string;
+  };
   
   const [email, setEmail] = useState('');
   const [submitted, setSubmitted] = useState(false);
@@ -18,19 +20,17 @@ export default function LandingPage() {
   const [feedbackDismissed, setFeedbackDismissed] = useState(false);
   const [showDemo, setShowDemo] = useState(false);
   const [feedbackData, setFeedbackData] = useState<FeedbackData>({
-  whatBrought: [],
-  frustrations: [],
-  features: [],
-  additionalThoughts: ''
-});
+    motivation: '',
+    frustration: '',
+    wish: '',
+    earlyAccess: '',
+    earlyAccessReason: '',
+    additionalThoughts: ''
+  });
 
   const observerRef = useRef<IntersectionObserver | null>(null);
 
   useEffect(() => {
-    // Check if feedback was dismissed
-    const dismissed = localStorage?.getItem('feedbackDismissed') === 'true';
-    setFeedbackDismissed(dismissed);
-
     // Intersection Observer for scroll animations
     observerRef.current = new IntersectionObserver(
       (entries) => {
@@ -43,7 +43,6 @@ export default function LandingPage() {
       { threshold: 0.1 }
     );
 
-    // Observe all animated elements
     const elements = document.querySelectorAll('.animate-on-scroll');
     elements.forEach((el) => observerRef.current?.observe(el));
 
@@ -89,22 +88,14 @@ export default function LandingPage() {
     }
   };
 
-  const handleFeedbackCheckbox = (
-  category: keyof Omit<FeedbackData, 'additionalThoughts'>,
-  value: string
-) => {
-  setFeedbackData(prev => ({
-    ...prev,
-    [category]: prev[category].includes(value)
-      ? prev[category].filter(v => v !== value)
-      : [...prev[category], value]
-  }));
-};
-
-
   const dismissFeedback = () => {
-    localStorage?.setItem('feedbackDismissed', 'true');
     setFeedbackDismissed(true);
+    setShowFeedback(false);
+  };
+
+  const handleFeedbackSubmit = () => {
+    console.log('Feedback submitted:', feedbackData);
+    alert('Thank you for your feedback! 🎉');
     setShowFeedback(false);
   };
 
@@ -119,39 +110,6 @@ export default function LandingPage() {
           to {
             opacity: 1;
             transform: translateY(0);
-          }
-        }
-
-        @keyframes fadeInLeft {
-          from {
-            opacity: 0;
-            transform: translateX(-30px);
-          }
-          to {
-            opacity: 1;
-            transform: translateX(0);
-          }
-        }
-
-        @keyframes fadeInRight {
-          from {
-            opacity: 0;
-            transform: translateX(30px);
-          }
-          to {
-            opacity: 1;
-            transform: translateX(0);
-          }
-        }
-
-        @keyframes scaleIn {
-          from {
-            opacity: 0;
-            transform: scale(0.9);
-          }
-          to {
-            opacity: 1;
-            transform: scale(1);
           }
         }
 
@@ -367,11 +325,11 @@ export default function LandingPage() {
       {(showFeedback || (!feedbackDismissed && submitted)) && (
         <section className="py-12 px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl mx-auto bg-gradient-to-br from-purple-900/50 to-slate-900/50 backdrop-blur-lg border border-purple-500/30 rounded-3xl p-8 shadow-2xl">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-2xl font-bold flex items-center gap-2">
-                <MessageSquare className="w-6 h-6 text-purple-400" />
-                💬 We'd love your quick feedback (totally optional!)
-              </h3>
+            <div className="flex items-center justify-between mb-8">
+              <div>
+                <h3 className="text-2xl font-bold text-white mb-2">💬 We'd love your quick feedback</h3>
+                <p className="text-purple-200">Help us make Fluxa the social app you'll actually want to use.</p>
+              </div>
               <button
                 onClick={() => setShowFeedback(false)}
                 className="p-2 hover:bg-white/10 rounded-full transition-all"
@@ -380,104 +338,99 @@ export default function LandingPage() {
               </button>
             </div>
 
-            {/* Question 1 */}
-            <div className="mb-8">
-              <h4 className="text-lg font-semibold mb-4 text-purple-300">
-                What brought you here today? (Select all that apply)
-              </h4>
-              <div className="space-y-3">
-                {[
-                  { emoji: '👀', text: "I'm curious about new social platforms" },
-                  { emoji: '💡', text: "I'm exploring Web3 and decentralized apps" },
-                  { emoji: '🧱', text: "I'm a content creator looking for better ownership" },
-                  { emoji: '🔐', text: "I'm interested in platforms that respect privacy" },
-                  { emoji: '🤝', text: 'I came here from a community or friend' },
-                  { emoji: '⚙️', text: 'Other' }
-                ].map((option, i) => (
-                  <label key={i} className="flex items-center gap-3 p-3 bg-white/5 rounded-lg hover:bg-white/10 cursor-pointer transition-all">
-                    <input
-                      type="checkbox"
-                      checked={feedbackData.whatBrought.includes(option.text)}
-                      onChange={() => handleFeedbackCheckbox('whatBrought', option.text)}
-                      className="w-4 h-4 rounded border-purple-400 text-purple-600 focus:ring-purple-500"
-                    />
-                    <span>{option.emoji} {option.text}</span>
-                  </label>
-                ))}
+            <div className="space-y-10">
+              {/* Q1: Motivation */}
+              <div>
+                <h4 className="text-lg font-semibold mb-3 text-purple-300">
+                  👀 What made you check out Fluxa today?
+                </h4>
+                <textarea
+                  value={feedbackData.motivation}
+                  onChange={(e) => setFeedbackData(prev => ({ ...prev, motivation: e.target.value }))}
+                  placeholder="e.g. I'm tired of algorithms, want more ownership, saw it on Reddit, etc."
+                  className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all min-h-28 resize-y"
+                />
               </div>
-            </div>
 
-            {/* Question 2 */}
-            <div className="mb-8">
-              <h4 className="text-lg font-semibold mb-4 text-purple-300">
-                What do you find frustrating about current social media platforms? (Select all that apply)
-              </h4>
-              <div className="space-y-3">
-                {[
-                  { emoji: '🚫', text: 'Too many ads and algorithms' },
-                  { emoji: '🧠', text: 'Lack of real content ownership' },
-                  { emoji: '🔒', text: 'Privacy and data misuse' },
-                  { emoji: '🕹️', text: "Creators don't earn fairly" },
-                  { emoji: '🧩', text: 'Fake engagement and bots' },
-                  { emoji: '⏱️', text: 'Feeds feel addictive or time-wasting' },
-                  { emoji: '⚙️', text: 'Other' }
-                ].map((option, i) => (
-                  <label key={i} className="flex items-center gap-3 p-3 bg-white/5 rounded-lg hover:bg-white/10 cursor-pointer transition-all">
-                    <input
-                      type="checkbox"
-                      checked={feedbackData.frustrations.includes(option.text)}
-                      onChange={() => handleFeedbackCheckbox('frustrations', option.text)}
-                      className="w-4 h-4 rounded border-purple-400 text-purple-600 focus:ring-purple-500"
-                    />
-                    <span>{option.emoji} {option.text}</span>
-                  </label>
-                ))}
+              {/* Q2: Core pain */}
+              <div>
+                <h4 className="text-lg font-semibold mb-3 text-purple-300">
+                  😣 What frustrates you most about current social media platforms?
+                </h4>
+                <textarea
+                  value={feedbackData.frustration}
+                  onChange={(e) => setFeedbackData(prev => ({ ...prev, frustration: e.target.value }))}
+                  placeholder="e.g. Too many ads, fake engagement, privacy issues, no creator earnings..."
+                  className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all min-h-28 resize-y"
+                />
               </div>
-            </div>
 
-            {/* Question 3 */}
-            <div className="mb-8">
-              <h4 className="text-lg font-semibold mb-4 text-purple-300">
-                What features would you love to see in a new kind of social app? (Select all that apply)
-              </h4>
-              <div className="space-y-3">
-                {[
-                  { emoji: '👥', text: 'True content ownership (NFT or Web3 based)' },
-                  { emoji: '💬', text: 'Transparent, ad-free feeds' },
-                  { emoji: '💸', text: 'Fair creator monetization' },
-                  { emoji: '🔗', text: 'Cross-platform portability of content' },
-                  { emoji: '🌍', text: 'Multi-language or global accessibility' },
-                  { emoji: '🛠️', text: 'Open-source or community-driven governance' },
-                  { emoji: '⚙️', text: 'Other' }
-                ].map((option, i) => (
-                  <label key={i} className="flex items-center gap-3 p-3 bg-white/5 rounded-lg hover:bg-white/10 cursor-pointer transition-all">
-                    <input
-                      type="checkbox"
-                      checked={feedbackData.features.includes(option.text)}
-                      onChange={() => handleFeedbackCheckbox('features', option.text)}
-                      className="w-4 h-4 rounded border-purple-400 text-purple-600 focus:ring-purple-500"
-                    />
-                    <span>{option.emoji} {option.text}</span>
-                  </label>
-                ))}
+              {/* Q3: Dream feature */}
+              <div>
+                <h4 className="text-lg font-semibold mb-3 text-purple-300">
+                  🌟 If you could change one thing about how social media works, what would it be?
+                </h4>
+                <textarea
+                  value={feedbackData.wish}
+                  onChange={(e) => setFeedbackData(prev => ({ ...prev, wish: e.target.value }))}
+                  placeholder="e.g. Let creators own posts, remove algorithms, reward engagement fairly..."
+                  className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all min-h-28 resize-y"
+                />
               </div>
-            </div>
 
-            {/* Optional Text Feedback */}
-            <div className="mb-8">
-              <h4 className="text-lg font-semibold mb-4 text-purple-300">
-                💭 Have any thoughts or suggestions? Tell us here:
-              </h4>
-              <textarea
-                value={feedbackData.additionalThoughts}
-                onChange={(e) => setFeedbackData(prev => ({ ...prev, additionalThoughts: e.target.value }))}
-                placeholder="Your feedback helps us build something you'll love..."
-                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all min-h-32 resize-y"
-              />
+              {/* Q4: Early access interest */}
+              <div>
+                <h4 className="text-lg font-semibold mb-3 text-purple-300">
+                  🚀 Would you like early access to test Fluxa before public launch?
+                </h4>
+                <div className="flex flex-col sm:flex-row gap-3">
+                  {["Yes, I want early access!", "Maybe later", "Not right now"].map((text, i) => (
+                    <label
+                      key={i}
+                      className="flex items-center gap-2 p-3 bg-white/5 rounded-lg hover:bg-white/10 cursor-pointer transition-all"
+                    >
+                      <input
+                        type="radio"
+                        name="earlyAccess"
+                        checked={feedbackData.earlyAccess === text}
+                        onChange={() => setFeedbackData(prev => ({ ...prev, earlyAccess: text }))}
+                        className="w-4 h-4 text-purple-600 focus:ring-purple-500"
+                      />
+                      <span>{text}</span>
+                    </label>
+                  ))}
+                </div>
+                {feedbackData.earlyAccess === "Yes, I want early access!" && (
+                  <textarea
+                    className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all mt-3 min-h-24 resize-y"
+                    placeholder="What kind of experience or feature would you love to test first?"
+                    value={feedbackData.earlyAccessReason}
+                    onChange={(e) =>
+                      setFeedbackData((prev) => ({
+                        ...prev,
+                        earlyAccessReason: e.target.value,
+                      }))
+                    }
+                  />
+                )}
+              </div>
+
+              {/* Optional comments */}
+              <div>
+                <h4 className="text-lg font-semibold mb-3 text-purple-300">
+                  💭 Any other thoughts or ideas you'd like to share?
+                </h4>
+                <textarea
+                  value={feedbackData.additionalThoughts}
+                  onChange={(e) => setFeedbackData(prev => ({ ...prev, additionalThoughts: e.target.value }))}
+                  placeholder="Your feedback helps us shape the future of Fluxa..."
+                  className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all min-h-28 resize-y"
+                />
+              </div>
             </div>
 
             {/* Demo Section */}
-            <div className="mb-6 p-6 bg-white/5 rounded-xl border border-purple-500/20">
+            <div className="mt-10 p-6 bg-white/5 rounded-xl border border-purple-500/20">
               <p className="text-center mb-4">
                 🧩 Want to see how it works?
               </p>
@@ -490,14 +443,16 @@ export default function LandingPage() {
               </button>
               {showDemo && (
                 <div className="mt-4 p-4 bg-slate-900/50 rounded-lg">
-                  <p className="text-center text-gray-400">Demo video/GIF would appear here</p>
-                  <img src="/app_demo.gif" alt="Fluxa Demo" className="w-full rounded-lg" />
+                  <p className="text-center text-gray-400 mb-2">Demo video/GIF would appear here</p>
+                  <div className="w-full h-64 bg-slate-800/50 rounded-lg flex items-center justify-center">
+                    <p className="text-gray-500">Demo Preview</p>
+                  </div>
                 </div>
               )}
             </div>
 
             {/* Dismissal Option */}
-            <div className="flex justify-between items-center pt-4 border-t border-purple-500/20">
+            <div className="flex justify-between items-center pt-6 mt-6 border-t border-purple-500/20">
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
                   type="checkbox"
@@ -507,11 +462,7 @@ export default function LandingPage() {
                 <span className="text-sm text-gray-400">✓ Don't show this again</span>
               </label>
               <button
-                onClick={() => {
-                  console.log('Feedback submitted:', feedbackData);
-                  alert('Thank you for your feedback! 🎉');
-                  setShowFeedback(false);
-                }}
+                onClick={handleFeedbackSubmit}
                 className="px-6 py-2 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full font-semibold hover:shadow-lg hover:shadow-purple-500/50 transition-all"
               >
                 Submit Feedback
