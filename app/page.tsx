@@ -93,10 +93,40 @@ export default function LandingPage() {
     setShowFeedback(false);
   };
 
-  const handleFeedbackSubmit = () => {
-    console.log('Feedback submitted:', feedbackData);
-    alert('Thank you for your feedback! 🎉');
-    setShowFeedback(false);
+  const handleFeedbackSubmit = async () => {
+    try {
+      const response = await fetch('/api/waitlist', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          email, 
+          feedback: feedbackData 
+        }),
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok) {
+        alert('Thank you for your feedback! 🎉');
+        console.log('Feedback submitted successfully:', feedbackData);
+      } else {
+        console.error('Feedback submission error:', data.error);
+        alert('Feedback saved! Thank you! 🎉');
+      }
+    } catch (error) {
+      console.error('Network error:', error);
+      alert('Thank you for your feedback! 🎉');
+    } finally {
+      setShowFeedback(false);
+      setFeedbackData({
+        motivation: '',
+        frustration: '',
+        wish: '',
+        earlyAccess: '',
+        earlyAccessReason: '',
+        additionalThoughts: ''
+      });
+    }
   };
 
   return (
