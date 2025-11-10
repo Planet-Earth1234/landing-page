@@ -263,7 +263,7 @@ export default function LandingPage() {
           </div>
 
           <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight bg-gradient-to-r from-white via-purple-200 to-pink-200 bg-clip-text text-transparent animate-on-scroll">
-            Creators Own Their Posts.
+            Own what you create
             <br />
             <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
               No Algorithms. No Middlemen.
@@ -314,6 +314,9 @@ export default function LandingPage() {
           <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-purple-300 to-pink-300 bg-clip-text text-transparent animate-on-scroll">
             Sneak Peek of Fluxa
           </h2>
+<h4 className="text-xl sm:text-2xl md:text-3xl font-semibold md:font-bold bg-gradient-to-r from-purple-300 via-pink-300 to-purple-200 bg-clip-text text-transparent mb-8 leading-relaxed tracking-wide animate-on-scroll">
+  A glimpse of the social internet we actually deserve.
+</h4>
           <p className="text-lg md:text-xl text-gray-300 mb-12 max-w-2xl mx-auto animate-on-scroll animate-delay-100">
             Your content. Your ownership. A new kind of social feed is coming.
           </p>
@@ -323,7 +326,7 @@ export default function LandingPage() {
               onClick={scrollToWaitlist}
               className="px-10 py-5 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full text-lg font-semibold hover:shadow-2xl hover:shadow-purple-500/50 transition-all duration-300 transform hover:scale-105 flex items-center space-x-2 mx-auto"
             >
-              <span>Join Waitlist</span>
+              <span>Join Early Access</span>
               <Zap className="w-5 h-5" />
             </button>
           </div>
@@ -386,7 +389,7 @@ export default function LandingPage() {
             disabled={loading || !email}
             className="px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full font-semibold hover:shadow-2xl hover:shadow-purple-500/50 transition-all duration-300 transform hover:scale-105 whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? 'Joining...' : submitted ? '✓ Subscribed!' : 'Join Waitlist'}
+            {loading ? 'Joining...' : submitted ? '✓ Subscribed!' : 'Join Early Access'}
           </button>
         </div>
 
