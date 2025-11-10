@@ -13,12 +13,14 @@ export default function LandingPage() {
   };
   
   const [email, setEmail] = useState('');
+  const [submittedEmail, setSubmittedEmail] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [showFeedback, setShowFeedback] = useState(false);
   const [feedbackDismissed, setFeedbackDismissed] = useState(false);
   const [showDemo, setShowDemo] = useState(false);
+  const [debugInfo, setDebugInfo] = useState<string>('');
   const [feedbackData, setFeedbackData] = useState<FeedbackData>({
     motivation: '',
     frustration: '',
@@ -61,73 +63,114 @@ export default function LandingPage() {
   };
 
   const handleSubmit = async () => {
-    if (!email) return;
-    setLoading(true);
-    setError('');
-    try {
-      const response = await fetch('/api/waitlist', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
-      });
-      const data = await response.json();
-      if (response.ok) {
-        setSubmitted(true);
-        setShowFeedback(true);
-        setTimeout(() => {
-          setSubmitted(false);
-          setEmail('');
-        }, 5000);
-      } else {
-        setError(data.error || 'Something went wrong');
-      }
-    } catch {
-      setError('Network error. Please try again.');
-    } finally {
-      setLoading(false);
+  if (!email) return;
+  
+  console.log("🚀 Starting waitlist submission...");
+  console.log("Email:", email);
+  
+  setLoading(true);
+  setError('');
+  
+  try {
+    console.log("📤 Sending POST request to /api/waitlist");
+    
+    const response = await fetch('/api/waitlist', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
+    });
+    
+    console.log("📥 Response status:", response.status);
+    console.log("📥 Response ok:", response.ok);
+    
+    const data = await response.json();
+    console.log("📥 Response data:", data);
+    
+    if (response.ok) {
+      console.log("✅ Waitlist submission successful!");
+      setSubmittedEmail(email); // Store email before clearing
+      setSubmitted(true);
+      setShowFeedback(true);
+      // Don't clear email yet - wait for feedback submission or dismissal
+      setTimeout(() => {
+        setSubmitted(false);
+      }, 5000);
+    } else {
+      console.log("❌ Waitlist submission failed:", data.error);
+      setError(data.error || 'Something went wrong');
     }
-  };
+  } catch (err) {
+    console.error("💥 Network error:", err);
+    setError('Network error. Please try again.');
+  } finally {
+    setLoading(false);
+  }
+};
 
   const dismissFeedback = () => {
-    setFeedbackDismissed(true);
-    setShowFeedback(false);
-  };
+  setFeedbackDismissed(true);
+  setShowFeedback(false);
+  setEmail('');
+  setSubmittedEmail('');
+};
+
+  
 
   const handleFeedbackSubmit = async () => {
-    try {
-      const response = await fetch('/api/waitlist', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          email, 
-          feedback: feedbackData 
-        }),
-      });
-      
-      const data = await response.json();
-      
-      if (response.ok) {
-        alert('Thank you for your feedback! 🎉');
-        console.log('Feedback submitted successfully:', feedbackData);
-      } else {
-        console.error('Feedback submission error:', data.error);
-        alert('Feedback saved! Thank you! 🎉');
-      }
-    } catch (error) {
-      console.error('Network error:', error);
+  const emailToUse = submittedEmail || email;
+  
+  console.log("\n📝 === FEEDBACK SUBMISSION ===");
+  console.log("Feedback data:", JSON.stringify(feedbackData, null, 2));
+  console.log("Email:", emailToUse);
+  
+  if (!emailToUse) {
+    console.error("❌ No email found!");
+    alert('Error: Email not found. Please try again.');
+    return;
+  }
+  
+  try {
+    console.log("📤 Sending feedback to /api/waitlist");
+    
+    const response = await fetch('/api/waitlist', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        email: emailToUse, 
+        feedback: feedbackData 
+      }),
+    });
+    
+    console.log("📥 Feedback response status:", response.status);
+    const data = await response.json();
+    console.log("📥 Feedback response data:", data);
+    
+    if (response.ok) {
+      console.log("✅ Feedback submitted successfully!");
       alert('Thank you for your feedback! 🎉');
-    } finally {
-      setShowFeedback(false);
-      setFeedbackData({
-        motivation: '',
-        frustration: '',
-        wish: '',
-        earlyAccess: '',
-        earlyAccessReason: '',
-        additionalThoughts: ''
-      });
+    } else {
+      console.error("❌ Feedback submission error:", data.error);
+      alert('Thank you for your feedback! 🎉');
     }
-  };
+  } catch (error) {
+    console.error("💥 Feedback network error:", error);
+    alert('Thank you for your feedback! 🎉');
+  } finally {
+    // NOW clear everything
+    setShowFeedback(false);
+    setEmail('');
+    setSubmittedEmail('');
+    setFeedbackData({
+      motivation: '',
+      frustration: '',
+      wish: '',
+      earlyAccess: '',
+      earlyAccessReason: '',
+      additionalThoughts: ''
+    });
+  }
+};
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-slate-950 text-white overflow-hidden">
@@ -556,6 +599,19 @@ export default function LandingPage() {
         >
           <MessageSquare className="w-6 h-6" />
         </button>
+      )}
+
+      {/* Debug Button (Development Only) */}
+      {process.env.NODE_ENV === 'development' && (
+        <div className="fixed bottom-8 left-8 z-40">
+         
+         
+          {debugInfo && (
+            <pre className="mt-2 p-4 bg-black/90 text-green-400 rounded-lg text-xs max-w-md overflow-auto max-h-96">
+              {debugInfo}
+            </pre>
+          )}
+        </div>
       )}
     </div>
   );

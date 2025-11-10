@@ -44,6 +44,57 @@ export async function POST(req: Request) {
       );
     }
 
+    // Check if this is a feedback-only submission
+    if (feedback) {
+      console.log("Feedback submission detected for:", email);
+      
+      // First, ensure email is in waitlist (upsert = insert if not exists, ignore if exists)
+      const { error: waitlistError } = await supabase
+        .from("waitlist")
+        .upsert([{ email }], { 
+          onConflict: 'email',
+          ignoreDuplicates: true 
+        });
+
+      if (waitlistError && waitlistError.code !== "23505") {
+        console.error("Waitlist upsert error:", waitlistError);
+        // Continue anyway - feedback is more important
+      } else {
+        console.log("Email ensured in waitlist:", email);
+      }
+      
+      // Store feedback
+      const { error: feedbackError } = await supabase
+        .from("feedback")
+        .insert([{
+          email,
+          motivation: feedback.motivation || null,
+          frustration: feedback.frustration || null,
+          wish: feedback.wish || null,
+          early_access: feedback.earlyAccess || null,
+          early_access_reason: feedback.earlyAccessReason || null,
+          additional_thoughts: feedback.additionalThoughts || null
+        }]);
+
+      if (feedbackError) {
+        console.error("Feedback insert error:", feedbackError);
+        // Don't fail - feedback is optional
+        return NextResponse.json({ 
+          success: true, 
+          message: "Thanks for your feedback! 🎉" 
+        });
+      }
+
+      console.log("Feedback stored successfully for:", email);
+      return NextResponse.json({ 
+        success: true, 
+        message: "Thanks for your feedback! We've also added you to our waitlist 🚀" 
+      });
+    }
+
+    // This is a waitlist-only submission (no feedback)
+    console.log("Waitlist submission for:", email);
+    
     // Insert into waitlist table
     const { data: waitlistData, error: insertError } = await supabase
       .from("waitlist")
@@ -64,29 +115,6 @@ export async function POST(req: Request) {
       
       console.error("Waitlist insert error:", insertError);
       throw insertError;
-    }
-
-    // If feedback is provided, store it
-    if (feedback && waitlistData) {
-      const { error: feedbackError } = await supabase
-        .from("feedback")
-        .insert([{
-          email,
-          motivation: feedback.motivation || null,
-          frustration: feedback.frustration || null,
-          wish: feedback.wish || null,
-          early_access: feedback.earlyAccess || null,
-          early_access_reason: feedback.earlyAccessReason || null,
-          additional_thoughts: feedback.additionalThoughts || null
-        }]);
-
-      if (feedbackError) {
-        console.error("Feedback insert error:", feedbackError);
-        // Don't fail the whole request if feedback fails
-        // The user is still added to the waitlist
-      } else {
-        console.log("Feedback stored successfully for:", email);
-      }
     }
 
     return NextResponse.json({ 
